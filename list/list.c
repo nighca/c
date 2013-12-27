@@ -1,28 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define TRUE 1
-#define FALSE 0
-
-typedef int Bool;
-
-typedef int NodeCnt;
-
-typedef struct _Node{
-    struct _Node* prev;
-    struct _Node* next;
-    NodeCnt* cnt;
-} Node;
-
-typedef struct _List{
-    Node* head;
-    Node* tail;
-
-    int length;
-} List;
+#include "list.h"
 
 Node* createNode(NodeCnt* cnt){
-    Node* node = malloc(sizeof(Node));
+    if(cnt == NULL){
+		cnt = malloc(sizeof(NodeCnt));
+	}
+
+	Node* node = malloc(sizeof(Node));
     node->prev = NULL;
     node->next = NULL;
     node->cnt = cnt;
@@ -41,6 +27,11 @@ List* createList(){
 
 Bool hasNode(List* list, Node* a){
     Node* n = list->head;
+
+	if(a == NULL){
+		return FALSE;
+	}
+
     while(n != NULL){
         if(n == a){
             return TRUE;
@@ -48,27 +39,38 @@ Bool hasNode(List* list, Node* a){
 
         n = n->next;
     }
+
     return FALSE;
 }
 
 void insertAfter(List* list, Node* a, Node* b){
-    if(!hasNode(list, a)){
+    if(a != NULL && !hasNode(list, a)){
         return;
     }
 
     if(a == NULL){
         b->prev = NULL;
         b->next = list->head;
+
+		if(list->head != NULL){
+	        list->head->prev = b;
+		}
         list->head = b;
     }else{
         b->prev = a;
         b->next = a->next;
+
+		if(a->next != NULL){
+			a->next->prev = b;
+		}
         a->next = b;
     }
 
     if(b->next == NULL){
         list->tail = b;
     }
+
+	list->length++;
 }
 
 void removeNode(List* list, Node* n){
@@ -93,6 +95,8 @@ void removeNode(List* list, Node* n){
 
     n->prev = NULL;
     n->next = NULL;
+
+	list->length--;
 }
 
 void unShift(List* list, Node* n){
@@ -132,8 +136,4 @@ void pushCnt(List* list, NodeCnt* cnt){
 NodeCnt* popCnt(List* list){
     Node* node = pop(list);
     return node->cnt;
-}
-
-void main(){
-    return;
 }
